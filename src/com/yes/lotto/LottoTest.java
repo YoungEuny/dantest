@@ -38,7 +38,7 @@ public class LottoTest {
 				}
 			}
 			
-			// 자동 선택시
+			// 1. 자동 선택
 			if(option == 1) {
 				outerLoop :
 				while(true) {
