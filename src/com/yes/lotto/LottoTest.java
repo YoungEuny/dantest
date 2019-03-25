@@ -30,8 +30,10 @@ public class LottoTest {
 					scan.nextLine();	// 에러 방지
 					break;
 				}
-				catch( InputMismatchException e ) {
-					System.out.println("잘못 입력했습니다. 정수만 입력 가능합니다.");
+				catch( InputMismatchException e ) {	// 예외 처리
+					System.out.println("1, 2, 3만 입력 가능합니다.\n");
+					System.out.println("원하는 옵션을 숫자로 선택하세요.");
+					System.out.println("1.자동 선택, 2.숫자 선택, 3. 끝내기");
 					scan = new Scanner(System.in);
 				}
 			}
@@ -57,16 +59,24 @@ public class LottoTest {
 					
 					System.out.println();
 					
+					int re;
+					
 					while(true) {	// 메뉴 선택
-						int re = lottoTest.checkRepeat();
-						if(re == 1) {	// 1.reset
-							break outerLoop;	
+						try {
+							re = lottoTest.checkRepeat();
+							if(re == 1) {	// 1.reset
+								break outerLoop;	
+							}
+							else if(re == 2) {	// 2. 로또 번호 출력하기
+								break;
+							}
+							else {
+								System.out.println("1과 2만 입력 가능합니다.");
+							}
 						}
-						else if(re == 2) {	// 2. 로또 번호 출력하기
-							break;
-						}
-						else {
-							System.out.println("다시 입력해주세요.");
+						catch(InputMismatchException e) {
+							System.out.println("1과 2만 입력 가능합니다.");
+							scan = new Scanner(System.in);
 						}
 					}
 				}
@@ -77,66 +87,60 @@ public class LottoTest {
 				int check = 0;
 				int checkException = 0;
 				int checkSpace = 0;
-				String split[] = null;
+				String split[];
 				int splitInt[] = null;
+				String number = "";
 
-				System.out.println("1~45까지의 숫자 중 좋아하는 숫자(정수)를 공백으로 구분하여 모두 입력해주세요.(중복 불가)");
+				System.out.println("1~45까지의 숫자 중 좋아하는 숫자(정수)를 ,(쉼표)로 구분하여 모두 입력해주세요.(중복 불가)");
 				
-				while(check == 0) {
+				while(check == 0) {	// 숫자나 쉼표 외의 문자들이 들어가면 다시 입력하게 만드는 코드(예외 처리)
 					check = 1;
 					
-					while(checkException == 0) {	// 예외 발생시 반복
-					try {
-						checkException = 1;
-						String number = scan.nextLine();
-
-						while(checkSpace == 0) {	// 공백 입력시 예외 처리, 예외 발생시 반복
-							checkSpace = 1;
+					while(checkException == 0) {
+						try {
+						
+							checkException = 1;
+							number = scan.nextLine();
 							
-							while(true) {
-								try {
-									if(number.charAt(0) == ' ') {
-										checkSpace = 0;
-										System.out.println("잘못 입력했습니다. 다시 입력해주세요.(1~45 사이의 정수와 공백만 입력)");
-										number = scan.nextLine();	// 예외 발생 구간
-									}
+							while(checkSpace == 0) {
+								checkSpace = 1;
+								
+								String tmp = number.replaceAll("(\r\n|\r|\n|\n\r)", "");	// 개행 제거
+								tmp = tmp.replaceAll(" " , "");
+								tmp = tmp.replaceAll("\\p{Z}", "");	// 공백 제거
+
+								if(tmp.trim().length() == 0) {
+									System.out.println("잘못 입력했습니다. 다시 입력해주세요.(1~45 사이의 정수와 공백만 입력)");
+									checkSpace = 0; checkException = 0;
 									break;
 								}
-								catch(StringIndexOutOfBoundsException e) {
-									System.out.println("잘못 입력했습니다. 다시 입력해주세요.(1~45 사이의 정수와 공백만 입력)");
-									number = scan.nextLine();
+								else {
+									split = tmp.split(",");	// ,로 문자열 구분
+									splitInt = Arrays.stream(split).mapToInt(Integer::parseInt).toArray();	// string 배열을 int 배열로 변환
 								}
 							}
 						}
-						// 공백으로 입력 숫자 구분 및 배열 자료형 변환
-						split = number.split("\\s+");
-						splitInt = Arrays.stream(split).mapToInt(Integer::parseInt).toArray();	// 예외 발생 구간
-						
-						break;
-					}
-					catch(NumberFormatException e) {
-						scan = new Scanner(System.in);
-						System.out.println("잘못 입력했습니다. 다시 입력해주세요.(1~45 사이의 정수와 공백만 입력)");
-						checkException = 0;
+						catch(NumberFormatException e) {
+							System.out.println("잘못 입력했습니다. 다시 입력해주세요.(1~45 사이의 정수와 공백만 입력)");
+							checkException = 0; checkSpace = 0;
 						}
 					}
 					
 					outerLoop2 :
-					for(int i=0; i<splitInt.length; i++) {
-						if(splitInt[i]<1 || splitInt[i]>45) {
-							System.out.println("범위를 넘는 숫자가 있습니다. 다시 입력해주세요.");
-							check = 0; checkException = 0;
-							break;
-						}
-						for(int j=i+1; j<splitInt.length; j++)
-							if(splitInt[i] == splitInt[j]) {
-								System.out.println("중복된 숫자가 있습니다. 다시 입력해주세요.");
-								check = 0; checkException = 0;
-								break outerLoop2;
+						for(int i=0; i<lottoTest.length(splitInt); i++) {
+							if(splitInt[i]<1 || splitInt[i]>45) {	// 숫자 범위 1~45 체크
+								System.out.println("범위를 넘는 숫자가 있습니다. 다시 입력해주세요.");
+								check = 0; checkException = 0; checkSpace = 0;
+								break;
 							}
-					}			
+							for(int j=i+1; j<lottoTest.length(splitInt); j++)
+								if(splitInt[i] == splitInt[j]) {	// 중복된 숫자 체크
+									System.out.println("중복된 숫자가 있습니다. 다시 입력해주세요.");
+									check = 0; checkException = 0; checkSpace = 0;
+									break outerLoop2;
+								}
+						}
 				}
-				//
 				
 				outerLoop3 :
 					while(true) {
@@ -157,16 +161,24 @@ public class LottoTest {
 						
 						System.out.println();
 						
+						int re;
+						
 						while(true) {	// 메뉴 선택
-							int re = lottoTest.checkRepeat();
-							if(re == 1) {	// 1.reset
-								break outerLoop3;
+							try {
+								re = lottoTest.checkRepeat();
+								if(re == 1) {	// 1.reset
+									break outerLoop3;	
+								}
+								else if(re == 2) {	// 2. 로또 번호 출력하기
+									break;
+								}
+								else {
+									System.out.println("1과 2만 입력 가능합니다.");
+								}
 							}
-							else if(re == 2) {	// 2.로또
-								break;
-							}
-							else {
-								System.out.println("다시 입력해주세요.");
+							catch(InputMismatchException e) {
+								System.out.println("1과 2만 입력 가능합니다.");
+								scan = new Scanner(System.in);
 							}
 						}
 					}
@@ -178,20 +190,23 @@ public class LottoTest {
 				break;
 			}
 			else {
-				System.out.println();
-				System.out.println("숫자를 다시 입력해주세요.");
+				System.out.println("1, 2, 3만 입력 가능합니다.\n");
 			}
 		}
 	}
 	
-	public int checkRepeat() {
+	public int checkRepeat() {	// 반복 체크
 		int repeat;
 		System.out.println("1.reset, 2.로또 번호 출력하기");
+
 		repeat = scan.nextInt();
 		scan.nextLine();	// 에러 방지
-		
+
 		return repeat;
 	}
-
+	
+	public int length(int[] splitInt){	// splitInt.length에서 생기는 nullpointerexception 예방
+		return splitInt == null ? 0 : splitInt.length;
+	}
 
 }

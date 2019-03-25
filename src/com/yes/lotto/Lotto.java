@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class Lotto {
 	
 	private int arr[] = new int[6];	// 추첨할 로또 번호
-	private int splitInt[] = null;	// split한 문자열을 정수형으로 변환하여 담을 배열
+	private int splitInt[];	// split한 문자열을 정수형으로 변환하여 담을 배열
 	
 	// 자동 선택
 	public void selectAuto() {
@@ -30,11 +30,11 @@ public class Lotto {
 	
 	public void selectNumber() { // 숫자 선택
 		
-		if(splitInt.length < 6) {	// 선택한 숫자가 5개 이하일 때
-			for(int i=0; i<splitInt.length; i++) {
+		if(length(splitInt) < 6) {	// 선택한 숫자가 5개 이하일 때
+			for(int i=0; i<length(splitInt); i++) {
 				arr[i] = splitInt[i];
 			}
-			for(int i=splitInt.length; i<arr.length; i++) {
+			for(int i=length(splitInt); i<arr.length; i++) {
 				arr[i] = (int)(Math.random()*45+1);	// 1~45까지의 정수 랜덤으로 삽입
 				
 				for(int j=0; j<i; j++) {	// 중복 제거
@@ -45,16 +45,16 @@ public class Lotto {
 				}
 			}
 		}
-		else if(splitInt.length == 6) {	// 선택한 숫자가 6개일 때
-			for(int i=0; i<splitInt.length; i++) {
+		else if(length(splitInt) == 6) {	// 선택한 숫자가 6개일 때
+			for(int i=0; i<length(splitInt); i++) {
 				arr[i] = splitInt[i];
 			}
 		}
 		else {	// 선택한 숫자가 7개 이상일 때
 			int temp, seed;
 			
-			for(int i=0; i<splitInt.length; i++) {	// splitInt 배열 섞기
-				seed = (int)(Math.random()*splitInt.length);	// 배열 index 랜덤 추첨
+			for(int i=0; i<length(splitInt); i++) {	// splitInt 배열 섞기
+				seed = (int)(Math.random()*length(splitInt));	// 배열 index 랜덤 추첨
 				temp = splitInt[i];
 				splitInt[i] = splitInt[seed];
 				splitInt[seed] = temp;
@@ -69,5 +69,9 @@ public class Lotto {
 
 	public int[] getArr() {
 		return arr;
+	}
+	
+	public int length(int[] splitInt){	// splitInt.length에서 생기는 nullpointerexception 예방
+		return splitInt == null ? 0 : splitInt.length;
 	}
 }
