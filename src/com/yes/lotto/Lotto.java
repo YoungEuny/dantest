@@ -28,7 +28,8 @@ public class Lotto {
 		splitInt = splitIntTemp;
 	}
 	
-	public void selectNumber() { // 숫자 선택
+	// 숫자 선택
+	public void selectNumber() {
 		
 		if(length(splitInt) < 6) {	// 선택한 숫자가 5개 이하일 때
 			for(int i=0; i<length(splitInt); i++) {
